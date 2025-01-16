@@ -13,5 +13,6 @@ namespace PRG_ASSG_CODE
         public Dictionary<string, Flight> Flights { get; set; }
         public Dictionary<string, BoardingGate> BoardingGates  { get; set; }
         public Dictionary<string, double> GateFees { get; set; }
+
     }
 }
