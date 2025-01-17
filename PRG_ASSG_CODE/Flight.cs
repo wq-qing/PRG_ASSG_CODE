@@ -8,5 +8,6 @@ namespace PRG_ASSG_CODE
 {
     internal class Flight
     {
+
     }
 }
