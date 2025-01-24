@@ -24,7 +24,9 @@ namespace PRG_ASSG_CODE
         }
 
         public double CalculateFees()
-        { }
+        {
+
+        }
         public override string ToString()
         {
             return base.ToString();
