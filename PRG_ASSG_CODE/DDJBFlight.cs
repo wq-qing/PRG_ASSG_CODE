@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PRG_ASSG_CODE;
-
+//==========================================================
+// Student Number	: S10267952A
+// Student Name	: Seah Qi Zhen Zoe 
+// Partner Name	: Tan Wan Cheng S10266775
+//==========================================================
 namespace PRG_ASSG_CODE
 {
     class DDJBFlight:Flight
