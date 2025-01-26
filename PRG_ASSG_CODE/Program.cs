@@ -18,6 +18,7 @@ using (StreamReader airlinesFile = new StreamReader ("airlines.csv"))
     }
 }
 // Basic Features (2)
+List<Flight> flights = new List<Flight>();
 void LoadFlights()
 {
     try
@@ -38,7 +39,7 @@ void LoadFlights()
                     DateTime expectedTime = DateTime.ParseExact(parts[3].Trim(), "h:mm tt", CultureInfo.InvariantCulture);
                     string specialRequest = parts.Length > 4 ? parts[4].Trim() : string.Empty;
 
-                    Flight.Add(new Flight(flightNumber, origin, destination, expectedTime, "On Time", specialRequest));
+                    flights.Add(new flights(flightNumber, origin, destination, expectedTime, "On Time", specialRequest));
                 }
             }
             Console.WriteLine("Flights loaded successfully!");
@@ -55,7 +56,20 @@ void LoadFlights()
 }
 
 // Basic Features (3)
+static void ListFlights()
+{
+    if (Flights.Count == 0)
+    {
+        Console.WriteLine("No flights available.");
+        return;
+    }
 
+    Console.WriteLine("\nList of Flights:");
+    foreach (var flight in flights)
+    {
+        Console.WriteLine(flight);
+    }
+}
 
 // Basic Features (4)
 // Basic Features (5)
