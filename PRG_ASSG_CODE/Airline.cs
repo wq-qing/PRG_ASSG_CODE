@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//==========================================================
+// Student Number	: S10267952A
+// Student Name	: Seah Qi Zhen Zoe 
+// Partner Name	: Tan Wan Cheng S10266775
+//==========================================================
 
 namespace PRG_ASSG_CODE
 {
@@ -51,7 +56,7 @@ namespace PRG_ASSG_CODE
 
         public override string ToString()
         {
-            return $"Name: {Name}, Code: {Code}, Flights: {Flights}";
+            return $"Airline Name: {Name}, Code: {Code}, Number of Flights: {Flights.Count}";
         }
 
     }

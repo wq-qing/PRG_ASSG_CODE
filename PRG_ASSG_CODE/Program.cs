@@ -51,20 +51,20 @@ void LoadingAirlines()
     }
 }
 Dictionary<string, BoardingGate> boardingGateDictionary = new Dictionary<string, BoardingGate>();
-void LoadingBoardingGates()
+void LoadBoardingGates()
 {
     using (StreamReader boardingGatesFile = new StreamReader("boardinggates.csv"))
     {
         string? boardingGate = boardingGatesFile.ReadLine();
         while ((boardingGate = boardingGatesFile.ReadLine()) != null)
         {
-            string[] boardingGateDetail = boardingGate.Split(",");
-            string gateName = boardingGateDetail[0];
-            bool supportCFFT = Convert.ToBoolean(boardingGateDetail[1]);
-            bool supportDDJB = Convert.ToBoolean(boardingGateDetail[2]);
-            bool supportLWTT = Convert.ToBoolean(boardingGateDetail[3]);
-            BoardingGate newBoardingGate = new BoardingGate(gateName, supportCFFT, supportDDJB, supportLWTT);
-            boardingGateDictionary[gateName] = newBoardingGate;
+            string[] boardingGateItem = boardingGate.Split(",");
+            string gateName = boardingGateItem[0];
+            bool supportCFFT = Convert.ToBoolean(boardingGateItem[1]);
+            bool supportDDJB = Convert.ToBoolean(boardingGateItem[2]);
+            bool supportLWTT = Convert.ToBoolean(boardingGateItem[3]);
+            BoardingGate withoutFlight = new BoardingGate(gateName, supportCFFT, supportDDJB, supportLWTT);
+            boardingGateDictionary[gateName] = withoutFlight;
         }
     }
 }
