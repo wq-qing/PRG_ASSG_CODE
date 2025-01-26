@@ -21,17 +21,17 @@ namespace PRG_ASSG_CODE
 
         public bool AddFlight(Flight flight)
         {
-
+            return false;
         }
 
         public double CalculateFees()
         {
-
+            return 0;
         }
 
         public bool RemoveFlight(Flight flight)
         {
-
+            return false;
         }
 
         public override string ToString()

@@ -5,19 +5,70 @@ using PRG_ASSG_CODE;
 // Student Name	: Seah Qi Zhen Zoe 
 // Partner Name	: Tan Wan Cheng 
 //==========================================================
-// Basic Features (1)
-using (StreamReader airlinesFile = new StreamReader ("airlines.csv"))
+
+//Loading Flight objects (Wan Cheng)
+List<Flight> flightList = new List<Flight>();
+void LoadingFlights()
 {
-    string? airline = airlinesFile.ReadLine ();
-    while ((airline =  airlinesFile.ReadLine()) != null)
+    using (StreamReader flightsFile = new StreamReader("flights.csv"))
     {
-        string[] airlinesDetails = airline.Split (',');
-        string airlineName = airlinesDetails[0];
-        string airlineCode = airlinesDetails[1];
-        //continue only when flightList is created
+        string? flight = flightsFile.ReadLine();
+        while ((flight = flightsFile.ReadLine()) != null)
+        {
+            string[] flightDetails = flight.Split(',');
+            string flightNumber = flightDetails[0];
+            string origin = flightDetails[1];
+            string destination = flightDetails[2];
+            DateTime expectedTime = Convert.ToDateTime(flightDetails[3]);
+            string specialRequest = flightDetails[4];
+            flightList.Add(new Flight(flightNumber, origin, destination, expectedTime, "On Time"));
+        }
     }
 }
-// Basic Features (2)
+
+// Basic Features (1) (Wan Cheng)
+List<Airline> airlineList = new List<Airline>();
+void LoadingAirlines()
+{
+    using (StreamReader airlinesFile = new StreamReader("airlines.csv"))
+    {
+        string? airline = airlinesFile.ReadLine();
+        while ((airline = airlinesFile.ReadLine()) != null)
+        {
+            Dictionary<string, Flight> airlineFlights = new Dictionary<string, Flight>();
+            string[] airlinesDetails = airline.Split(',');
+            string airlineName = airlinesDetails[0];
+            string airlineCode = airlinesDetails[1];
+            foreach (Flight flight in flightList)
+            {
+                if ((flight.FlightNumber).Contains(airlineCode))
+                {
+                    airlineFlights[flight.FlightNumber] = flight;
+                }
+            }
+            airlineList.Add(new Airline(airlineName, airlineCode, airlineFlights));
+        }
+    }
+}
+List<BoardingGate> boardingGateList = new List<BoardingGate>();
+void LoadingBoardingGates()
+{
+    using (StreamReader boardingGatesFile = new StreamReader("boardinggates.csv"))
+    {
+        string? boardingGate = boardingGatesFile.ReadLine();
+        while ((boardingGate = boardingGatesFile.ReadLine()) != null)
+        {
+            string[] boardingGateDetail = boardingGate.Split(",");
+            string gateName = boardingGateDetail[0];
+            bool supportCFFT = Convert.ToBoolean(boardingGateDetail[1]);
+            bool supportDDJB = Convert.ToBoolean(boardingGateDetail[2]);
+            bool supportLWTT = Convert.ToBoolean(boardingGateDetail[3]);
+            boardingGateList.Add(new BoardingGate(gateName, supportCFFT, supportDDJB, supportLWTT));
+        }
+    }
+}
+
+// Basic Features (2) (Zoe)
 List<Flight> flights = new List<Flight>();
 void LoadFlights()
 {
@@ -55,7 +106,7 @@ void LoadFlights()
     }
 }
 
-// Basic Features (3)
+// Basic Features (3) (Zoe)
 static void ListFlights()
 {
     if (Flights.Count == 0)
@@ -71,9 +122,9 @@ static void ListFlights()
     }
 }
 
-// Basic Features (4)
-// Basic Features (5)
-// Basic Features (6)
-// Basic Features (7)
-// Basic Features (8)
-// Basic Features (9)
+// Basic Features (4) (Wan Cheng)
+// Basic Features (5) (Zoe)
+// Basic Features (6) (Zoe)
+// Basic Features (7) (Wan Cheng)
+// Basic Features (8) (Wan Cheng)
+// Basic Features (9) (Zoe)

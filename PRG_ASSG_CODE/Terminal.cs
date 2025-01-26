@@ -25,18 +25,18 @@ namespace PRG_ASSG_CODE
 
         public bool AddAirline(Airline airline)
         {
-
+            return false;
         }
 
         public bool AddBoardingGate(BoardingGate boardingGate)
         {
-
+            return false;
         }
 
-        public Airline GetAirlineFromFlight(Flight flight)
-        {
+        //public Airline GetAirlineFromFlight(Flight flight)
+        //{
 
-        }
+        //}
 
         public void PrintAirlineFees() 
         {

@@ -14,6 +14,14 @@ namespace PRG_ASSG_CODE
         public bool SupportsLWTT { get; set; }
         public Flight Flight { get; set; }
 
+        public BoardingGate(string gateName, bool supportsCFFT, bool supportsDDJB, bool supportsLWTT)
+        {
+            GateName = gateName;
+            SupportsCFFT = supportsCFFT;
+            SupportsDDJB = supportsDDJB;
+            SupportsLWTT = supportsLWTT;
+        }       
+
         public BoardingGate(string gateName, bool supportsCFFT, bool supportsDDJB, bool supportsLWTT, Flight flight)
         {
             GateName = gateName;
@@ -25,7 +33,7 @@ namespace PRG_ASSG_CODE
 
         public double CalculateFees()
         {
-
+            return 0;
         }
         public override string ToString()
         {
