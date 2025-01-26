@@ -33,11 +33,24 @@ namespace PRG_ASSG_CODE
 
         public double CalculateFees()
         {
-            return 0;
+            double baseFee = 300;
+            if (SupportsCFFT)
+            {
+                return baseFee + 150;
+            }
+            else if (SupportsDDJB)
+            {
+                return baseFee + 300;
+            }
+            else if (SupportsLWTT)
+            {
+                return baseFee + 500;
+            }
+            return baseFee;
         }
         public override string ToString()
         {
-            return base.ToString();
+            return $"Gate Name: {GateName}, Supports CFFT: {SupportsCFFT}, Supports DDJB: {SupportsDDJB}, Supports LWTT: {SupportsLWTT}";
         }
     }
 }

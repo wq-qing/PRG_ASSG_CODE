@@ -21,22 +21,37 @@ namespace PRG_ASSG_CODE
 
         public bool AddFlight(Flight flight)
         {
+            if (!Flights.ContainsKey(flight.FlightNumber))
+            {
+                Flights[flight.FlightNumber] = flight;
+                return true;
+            }
             return false;
         }
 
+
         public double CalculateFees()
         {
-            return 0;
+            double numOfFlights = Flights.Count;
+            double numOfDiscount = Math.Floor(numOfFlights / 3);
+            double discuntAmount = numOfDiscount * 350;
+            return discuntAmount;
         }
 
         public bool RemoveFlight(Flight flight)
         {
+            if (Flights.ContainsKey(flight.FlightNumber))
+            {
+                Flights.Remove(flight.FlightNumber);
+                return true;
+            }
             return false;
         }
 
+
         public override string ToString()
         {
-            return base.ToString();
+            return $"Name: {Name}, Code: {Code}, Flights: {Flights}";
         }
 
     }
