@@ -70,58 +70,24 @@ void LoadBoardingGates()
 }
 
 // Basic Features (2) (Zoe)
-List<Flight> flights = new List<Flight>();
+List<Flight> flightslist = new List<Flight>();
 void LoadFlights()
 {
-    try
+    using (StringReader sr = new StringReader("flights.csv"))
     {
-        string filePath = "flights.csv";
-        if (File.Exists(filePath))
+        string? flightscontent = sr.ReadLine();
+        while(( flightscontent= sr.ReadLine() )!= null)
         {
-            string[] lines = File.ReadAllLines(filePath);
-
-            for (int i = 1; i < lines.Length; i++)
-            {
-                string[] parts = lines[i].Split(',');
-                if (parts.Length >= 4)
-                {
-                    string flightNumber = parts[0].Trim();
-                    string origin = parts[1].Trim();
-                    string destination = parts[2].Trim();
-                    DateTime expectedTime = DateTime.ParseExact(parts[3].Trim(), "h:mm tt", CultureInfo.InvariantCulture);
-                    string specialRequest = parts.Length > 4 ? parts[4].Trim() : string.Empty;
-
-                    flights.Add(new flights(flightNumber, origin, destination, expectedTime, "On Time", specialRequest));
-                }
-            }
-            Console.WriteLine("Flights loaded successfully!");
+           string[] flights= flightscontent.Split(",");
+            string specialRequest = flights[4];
+            flightslist.Add(new Flight(Convert.ToString(flightscontent[0]), Convert.ToString(flightscontent[1]), Convert.ToString(flightscontent[2]), Convert.ToDateTime(flightscontent[3]),"On Time"));
         }
-        else
-        {
-            Console.WriteLine("Error: file not found.");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error loading flights: {ex.Message}");
+
     }
 }
-
 // Basic Features (3) (Zoe)
-static void ListFlights()
-{
-    if (Flights.Count == 0)
-    {
-        Console.WriteLine("No flights available.");
-        return;
-    }
 
-    Console.WriteLine("\nList of Flights:");
-    foreach (var flight in flights)
-    {
-        Console.WriteLine(flight);
-    }
-}
+
 
 // Basic Features (4) (Wan Cheng)
 // Basic Features (5) (Zoe)
