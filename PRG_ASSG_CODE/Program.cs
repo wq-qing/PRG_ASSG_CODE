@@ -60,8 +60,8 @@ void LoadFlights()
         string? flightscontent = sr.ReadLine();
         if(( flightscontent= sr.ReadLine() )!= null)
         {
-           string[] flights= flightscontent.Split(",");
-            string specialRequest = flights[4];
+           string[] flight= flightscontent.Split(",");
+            string specialRequest = flight[4];
             flightlist.Add(new Flight(Convert.ToString(flightscontent[0]), Convert.ToString(flightscontent[1]), Convert.ToString(flightscontent[2]), Convert.ToDateTime(flightscontent[3]),"On Time"));
         }
         else
@@ -73,49 +73,127 @@ void LoadFlights()
 }
 // Basic Features (3) (Zoe)
 
-void ListAllFlights()
+void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
 {
     if (flightlist.Count == 0)
     {
         Console.WriteLine("No flights available.");
         return;
     }
-
-    string header = string.Format("{0,-12} {1,-20} {2,-20} {3,-20} {4}","Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time");
+    string header = string.Format(
+        "{0,-12} {1,-20} {2,-20} {3,-20} {4}",
+        "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time"
+    );
     Console.WriteLine(new string('=', header.Length));
     Console.WriteLine(header);
     Console.WriteLine(new string('=', header.Length));
 
     foreach (var flight in flightlist)
     {
-        Console.WriteLine(string.Format("{0,-12} {1,-20} {2,-20} {3,-20} {4:dd/M/yyyy hh:mm:ss tt}",flight.FlightNumber, AirlineName(flight.FlightNumber), flight.Origin, flight.Destination, flight.ExpectedTime));
+        string AirlineCode = flight.FlightNumber.Substring(0, 2);
+        string AirlineName = "";
+        foreach (var airline in airlineList)
+        {
+            if (airline.Code == AirlineCode)
+            {
+                AirlineName = airline.Name;
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Couldn't find airline.");
+            }
+        }
+
+        // Print flight details
+        Console.WriteLine(string.Format(
+            "{0,-12} {1,-20} {2,-20} {3,-20} {4:dd/MM/yyyy hh:mm:ss tt}",
+            flight.FlightNumber, AirlineName, flight.Origin, flight.Destination, flight.ExpectedTime
+        ));
     }
 }
 
 
-string AirlineName(string flightNumber)
-{ 
-    string airlineCode = flightNumber.Substring(0, 2);
-    return airlineCode switch
-    {
-        "SQ" => "Singapore Airlines",
-        "MH" => "Malaysia Airlines",
-        "JL" => "Japan Airlines",
-        "CX" => "Cathay Pacific",
-        "QF" => "Qantas Airways",
-        "TR" => "Scoot",
-        "EK" => "Emirates",
-        "BA" => "British Airways",
-    };
-}
 // Basic Features (4) (Wan Cheng)
 // Basic Features (5) (Zoe)
-void BoardingGate()
+void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates)
 {
-    Console.WriteLine("Enter your flight number");
+    Console.Write("Enter your Flight Number : ");
+    string?flightNumber = Convert.ToString(Console.ReadLine());
 
+    if (flightNumber==null)
+    {
+        Console.WriteLine("Invalid flight number. Please try again.");
+        return;
+    }
+    Flight flight = null;
+    foreach (var item in flightlist)
+    {
+        if (item.FlightNumber == flightNumber)
+        {
+            flight = item;
+            break;
+        }
+    }
+    if (flight == null)
+    {
+        Console.WriteLine("Flight not found.");
+        return;
+    }
+
+
+
+    // Display flight details
+    Console.WriteLine("Flight Details:");
+    Console.WriteLine($"Flight Number: {flight.FlightNumber}, Airline: {AirlineName(flight.FlightNumber)}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/M/yyyy hh:mm:ss tt}, Special Request: {flight.specialRequest}");
+
+    while (true)
+    {
+        Console.Write("Enter the Boarding Gate: ");
+        string boardingGate = Console.ReadLine()?.Trim();
+
+        if (BoardingGates.ContainsKey(boardingGate))
+        {
+            Console.WriteLine("Error: The selected Boarding Gate is already assigned to another flight. Please choose a different gate.");
+            continue;
+        }
+
+        // Assign the boarding gate
+        BoardingGates[boardingGate] = new BoardingGates { Gate = boardingGate, AssignedFlight = flight };
+        flight.BoardingGate = boardingGate;
+
+
+        Console.Write("Would you like to update the flight status? (Y/N): ");
+        string response = Console.ReadLine()?.Trim().ToUpper();
+
+        if (response == "Y")
+        {
+            Console.Write("Enter the new status (Delayed, Boarding, On Time): ");
+            string status = Console.ReadLine()?.Trim();
+
+            if (status == "Delayed" || status == "Boarding" || status == "On Time")
+            {
+                flight.Status = status;
+            }
+            else
+            {
+                Console.WriteLine("Invalid status entered. Setting the default status to 'On Time'.");
+                flight.Status = "On Time";
+            }
+        }
+        else
+        {
+            flight.Status = "On Time";
+        }
+
+   
+        Console.WriteLine($"Successfully assigned Boarding Gate '{boardingGate}' to Flight '{flightNumber}'.");
+        Console.WriteLine($"Flight Details: Flight Number: {flight.FlightNumber}, Airline: {AirlineName(flight.FlightNumber)}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/M/yyyy hh:mm:ss tt}, Special Request: {flight.specialRequest}, Boarding Gate: {flight.BoardingGate}, Status: {flight.Status}");
+        break;
+    }
 }
 // Basic Features (6) (Zoe)
+
 // Basic Features (7) (Wan Cheng)
 // Basic Features (8) (Wan Cheng)
 // Basic Features (9) (Zoe)
