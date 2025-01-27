@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel.Design;
+using System.Globalization;
 using PRG_ASSG_CODE;
 //==========================================================
 // Student Number	: S10267952A S10266775
@@ -6,25 +7,6 @@ using PRG_ASSG_CODE;
 // Partner Name	: Tan Wan Cheng 
 //==========================================================
 
-//Loading Flight objects (Wan Cheng)
-List<Flight> flightList = new List<Flight>();
-void LoadingFlights()
-{
-    using (StreamReader flightsFile = new StreamReader("flights.csv"))
-    {
-        string? flight = flightsFile.ReadLine();
-        while ((flight = flightsFile.ReadLine()) != null)
-        {
-            string[] flightDetails = flight.Split(',');
-            string flightNumber = flightDetails[0];
-            string origin = flightDetails[1];
-            string destination = flightDetails[2];
-            DateTime expectedTime = Convert.ToDateTime(flightDetails[3]);
-            string specialRequest = flightDetails[4];
-            flightList.Add(new Flight(flightNumber, origin, destination, expectedTime, "On Time"));
-        }
-    }
-}
 
 // Basic Features (1) (Wan Cheng)
 List<Airline> airlineList = new List<Airline>();
@@ -39,7 +21,7 @@ void LoadingAirlines()
             string[] airlinesDetails = airline.Split(',');
             string airlineName = airlinesDetails[0];
             string airlineCode = airlinesDetails[1];
-            foreach (Flight flight in flightList)
+            foreach (Flight flight in flightlist)
             {
                 if ((flight.FlightNumber).Contains(airlineCode))
                 {
@@ -70,27 +52,69 @@ void LoadBoardingGates()
 }
 
 // Basic Features (2) (Zoe)
-List<Flight> flightslist = new List<Flight>();
+List<Flight> flightlist = new List<Flight>();
 void LoadFlights()
 {
     using (StringReader sr = new StringReader("flights.csv"))
     {
         string? flightscontent = sr.ReadLine();
-        while(( flightscontent= sr.ReadLine() )!= null)
+        if(( flightscontent= sr.ReadLine() )!= null)
         {
            string[] flights= flightscontent.Split(",");
             string specialRequest = flights[4];
-            flightslist.Add(new Flight(Convert.ToString(flightscontent[0]), Convert.ToString(flightscontent[1]), Convert.ToString(flightscontent[2]), Convert.ToDateTime(flightscontent[3]),"On Time"));
+            flightlist.Add(new Flight(Convert.ToString(flightscontent[0]), Convert.ToString(flightscontent[1]), Convert.ToString(flightscontent[2]), Convert.ToDateTime(flightscontent[3]),"On Time"));
         }
-
+        else
+        {
+            Console.WriteLine("Invalid file path");
+        }
+       
     }
 }
 // Basic Features (3) (Zoe)
 
+void ListAllFlights()
+{
+    if (flightlist.Count == 0)
+    {
+        Console.WriteLine("No flights available.");
+        return;
+    }
+
+    string header = string.Format("{0,-12} {1,-20} {2,-20} {3,-20} {4}","Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time");
+    Console.WriteLine(new string('=', header.Length));
+    Console.WriteLine(header);
+    Console.WriteLine(new string('=', header.Length));
+
+    foreach (var flight in flightlist)
+    {
+        Console.WriteLine(string.Format("{0,-12} {1,-20} {2,-20} {3,-20} {4:dd/M/yyyy hh:mm:ss tt}",flight.FlightNumber, AirlineName(flight.FlightNumber), flight.Origin, flight.Destination, flight.ExpectedTime));
+    }
+}
 
 
+string AirlineName(string flightNumber)
+{ 
+    string airlineCode = flightNumber.Substring(0, 2);
+    return airlineCode switch
+    {
+        "SQ" => "Singapore Airlines",
+        "MH" => "Malaysia Airlines",
+        "JL" => "Japan Airlines",
+        "CX" => "Cathay Pacific",
+        "QF" => "Qantas Airways",
+        "TR" => "Scoot",
+        "EK" => "Emirates",
+        "BA" => "British Airways",
+    };
+}
 // Basic Features (4) (Wan Cheng)
 // Basic Features (5) (Zoe)
+void BoardingGate()
+{
+    Console.WriteLine("Enter your flight number");
+
+}
 // Basic Features (6) (Zoe)
 // Basic Features (7) (Wan Cheng)
 // Basic Features (8) (Wan Cheng)
