@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.Design;
+﻿using PRG_ASSG_CODE;
 using System.Globalization;
-using PRG_ASSG_CODE;
 //==========================================================
 // Student Number	: S10267952A S10266775
 // Student Name	: Seah Qi Zhen Zoe 
@@ -16,7 +14,7 @@ List<string[]> flightData = new List<string[]>();
 
 // Basic Features (1) (Wan Cheng)
 List<Airline> airlineList = new List<Airline>();
-void LoadingAirlines()
+void LoadAirlines()
 {
     using (StreamReader airlinesFile = new StreamReader("airlines.csv"))
     {
@@ -31,7 +29,7 @@ void LoadingAirlines()
             {
                 if ((flight.FlightNumber).Contains(airlineCode))
                 {
-                    airlineFlights[flight.FlightNumber] = flight;
+                    airlineFlights[airlineCode] = flight;
                 }
             }
             airlineList.Add(new Airline(airlineName, airlineCode, airlineFlights));
@@ -128,6 +126,47 @@ void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
 
 }
 // Basic Features (4) (Wan Cheng)
+
+void ListBoardingGates()
+{
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("List of Boarding Gates for Changi Airport Termianl 5");
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}", "Gate Name", "DDJB", "CFFT", "LWTT");
+    string supportsDDJB;
+    string supportsCFFT;
+    string supportsLWTT;
+    foreach (BoardingGate gateDetails in boardingGateDictionary.Values)
+    {
+        if (gateDetails.SupportsDDJB)
+        {
+            supportsDDJB = "True";
+        }
+        else
+        {
+            supportsDDJB = "False";
+        }
+        if (gateDetails.SupportsCFFT)
+        {
+            supportsCFFT = "True";
+        }
+        else
+        {
+            supportsCFFT = "False";
+        }
+        if (gateDetails.SupportsLWTT)
+        {
+            supportsLWTT = "True";
+        }
+        else
+        {
+            supportsLWTT = "False";
+        }
+        Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}", gateDetails.GateName, supportsDDJB, supportsCFFT, supportsLWTT);
+    }
+
+}
+
 // Basic Features (5) (Zoe)
 
 void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Flight> flightlist, List<Airline> airlineList)
@@ -281,8 +320,39 @@ void CreateNewFlight(List<Flight> flightlist)
     }
 }
 // Basic Features (7) (Wan Cheng)
+
+void ListAirlines()
+{
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("List of Airlines for Changi Airport Terminal 5");
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("{0, -16}{1, -19}", "Airline Code", "Airline Name");
+    foreach (Airline airline in airlineList)
+    {
+        Console.WriteLine("{0, -16}{1, -19}", airline.Code, airline.Name);
+    }
+    Console.Write("Enter Airline Code: ");
+    string airlineCodeEntered = Console.ReadLine().ToLower();
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    foreach (Airline airline in airlineList)
+    {
+        if (airline.Code.ToLower().Contains(airlineCodeEntered))
+        {
+            Console.WriteLine($"List of flights for {airline.Name}");
+            Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+            Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}{4, -31}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time");
+            Dictionary<string, Flight> flights = airline.Flights;
+            Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}{4, -31}", flights[airline.Code].FlightNumber, airline.Name, flights[airline.Code].Origin, flights[airline.Code].Destination, flights[airline.Code].ExpectedTime);
+        }
+    }
+
+}
+LoadFlights();
+LoadAirlines();
+ListAllFlights(flightlist, airlineList);
+ListAirlines();
+
 // Basic Features (8) (Wan Cheng)
-// Basic Features (9) (Zoe)
 
 // Basic Features (9) (Zoe)
 
