@@ -120,7 +120,7 @@ void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
     {
         string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
         Console.WriteLine(string.Format(
-     "{0,-12} {1,-20} {2,-20} {3,-20} {4,-20}",
+     "{0,-12} {1,-20} {2,-20} {3,-20} {4}",
      flight.FlightNumber, airlineName, flight.Origin, flight.Destination, flight.ExpectedTime.ToString("dd/MM/yyyy hh:mm:ss tt")
  ));
 
@@ -129,44 +129,48 @@ void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
 }
 // Basic Features (4) (Wan Cheng)
 // Basic Features (5) (Zoe)
+
 void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Flight> flightlist, List<Airline> airlineList)
-{ 
+{
 
     Console.WriteLine("Enter Flight Number: ");
-    string flightNumber = Console.ReadLine().Trim();
+    string flightNumber = Console.ReadLine().Trim().ToUpper();
     Flight flight = null;
-    string specialRequest = "None";
-    string AirlineName = GetAirlineName(flight.FlightNumber, airlineList);
+    foreach (var item in flightlist)
+    {
+        if (item.FlightNumber == flightNumber)
+        {
+            flight = item;
+            break;
+        }
+    }
     if (flight == null)
     {
         Console.WriteLine("Flight not found.");
         return;
     }
-    else
-    {
-        foreach (var item in flightlist)
-        {
-            if (item.FlightNumber == flightNumber)
-            {
-                flight = item;
+    string AirlineName = GetAirlineName(flight.FlightNumber, airlineList);
+    string specialRequest = "None";
+
           
-                foreach (var flightEntry in flightData)
+               foreach (var flightEntry in flightData)
                 {
                     if (flightEntry[0] == flightNumber && flightEntry.Length >= 5)
                     {
                         specialRequest = string.IsNullOrEmpty(flightEntry[4]) ? "None" : flightEntry[4];
-                        Console.WriteLine("Flight Details:");
-                        Console.WriteLine($"Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}, Special Request: {specialRequest}");
+                        break;
                     }
-                    else
-                    {
-                        Console.WriteLine("Flight Details:");
-                        Console.WriteLine($"Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}");
-                    }
-                }
-            }
-        }
+                    
+               }
+ 
+    Console.WriteLine("Flight Details:");
+    Console.WriteLine($"Flight Number: {flight.FlightNumber}\nOrigin: {flight.Origin}\nDestination: {flight.Destination}\nExpected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}");
+    if (!string.IsNullOrEmpty(specialRequest))
+    {
+        Console.WriteLine($"Special Request Code: {specialRequest}");
     }
+
+
 
     while (true)
     {
@@ -199,29 +203,31 @@ void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Fli
 
         if (response == "Y")
         {
-            Console.WriteLine("Enter the new status (Delayed, Boarding, On Time): ");
-            string status = Console.ReadLine()?.Trim();
+            Console.WriteLine("Enter the new status:\n1. Delayed\n2. Boarding\n3. On Time");
+            string statusInput = Console.ReadLine()?.Trim();
 
-            if (status == "Delayed" || status == "Boarding" || status == "On Time")
+            if (statusInput == "1")
             {
-                flight.Status = status;
+                flight.Status = "Delayed";
+            }
+            else if (statusInput == "2")
+            {
+                flight.Status = "Boarding";
+            }
+            else if (statusInput == "3")
+            {
+                flight.Status = "On Time";
             }
             else
             {
-                Console.WriteLine("Invalid status entered. Setting the default status to 'On Time'.");
+                Console.WriteLine("Invalid selection. Setting status to 'On Time'.");
                 flight.Status = "On Time";
             }
         }
-        else
-        {
-            flight.Status = "On Time";
-        }
-
-        Console.WriteLine($"Successfully assigned Boarding Gate '{boardingGate}' to Flight '{flight.FlightNumber}'.");
-        Console.WriteLine($"Flight Details: Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}, Special Request: {specialRequest}, Boarding Gate: {boardingGate}, Status: {flight.Status}");
+        Console.WriteLine($"Flight {flight.FlightNumber} has been assigned to Boarding Gate {boardingGate}!");
         break;
     }
-}
+}                                                                                    
 // Basic Features (6) (Zoe)
 void CreateNewFlight(List<Flight> flightlist)
 {
@@ -337,3 +343,7 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
 
 
 
+LoadingAirlines();
+LoadBoardingGates();
+LoadFlights();
+AssignBoardingGate(boardingGateDictionary,flightlist,airlineList);
