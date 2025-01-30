@@ -208,9 +208,6 @@ void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Fli
     {
         Console.WriteLine($"Special Request Code: {specialRequest}");
     }
-
-
-
     while (true)
     {
         Console.WriteLine("Enter the Boarding Gate: ");
@@ -292,16 +289,16 @@ void CreateNewFlight(List<Flight> flightlist)
         catch (FormatException)
         {
             Console.WriteLine("Invalid time format. Please enter in hh:mm tt format. Try again.");
-            continue;
+            break;
         }
 
-        Console.Write("Would you like to enter a Special Request Code? (Y/N): ");
+        Console.WriteLine("Would you like to enter a Special Request Code? (Y/N): ");
         string specialRequestResponse = Console.ReadLine()?.Trim().ToUpper();
         string specialRequest = "";
 
         if (specialRequestResponse == "Y")
         {
-            Console.Write("Enter Special Request Code: ");
+            Console.WriteLine("Enter Special Request Code: ");
             specialRequest = Console.ReadLine()?.Trim();
         }
         Flight newFlight = new Flight(flightNumber, origin, destination, expectedTime, "On Time");
@@ -316,6 +313,10 @@ void CreateNewFlight(List<Flight> flightlist)
         {
             Console.WriteLine("Flight(s) have been successfully added.");
             break;
+        }
+        else
+        {
+            CreateNewFlight(flightlist);
         }
     }
 }
@@ -347,10 +348,6 @@ void ListAirlines()
     }
 
 }
-LoadFlights();
-LoadAirlines();
-ListAllFlights(flightlist, airlineList);
-ListAirlines();
 
 // Basic Features (8) (Wan Cheng)
 
@@ -363,8 +360,6 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
         Console.WriteLine("No flights scheduled for today.");
         return;
     }
-
-    // Sort flights by ExpectedTime
     flightlist = flightlist.OrderBy(f => f.ExpectedTime).ToList();
 
     string header = string.Format(
@@ -380,8 +375,6 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
         string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
         string specialRequest = "None";
         string boardingGate = "None";
-
-        // Retrieve special request if applicable
         foreach (var flightEntry in flightData)
         {
             if (flightEntry[0] == flight.FlightNumber && flightEntry.Length >= 5)
@@ -390,8 +383,6 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
                 break;
             }
         }
-
-        // Retrieve assigned boarding gate if applicable
         foreach (var gate in BoardingGates)
         {
             if (gate.Value.Flight != null && gate.Value.Flight.FlightNumber == flight.FlightNumber)
@@ -410,10 +401,3 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
     Console.WriteLine(new string('=', header.Length));
 }
 
-
-
-
-LoadingAirlines();
-LoadBoardingGates();
-LoadFlights();
-AssignBoardingGate(boardingGateDictionary,flightlist,airlineList);
