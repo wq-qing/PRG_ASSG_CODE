@@ -219,7 +219,57 @@ void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Fli
     }
 }
 // Basic Features (6) (Zoe)
+void CreateNewFlight(List<Flight> flightlist)
+{
+    while (true)
+    {
+        Console.Write("Enter Flight Number: ");
+        string flightNumber = Console.ReadLine()?.Trim();
 
+        Console.Write("Enter Origin: ");
+        string origin = Console.ReadLine()?.Trim();
+
+        Console.Write("Enter Destination: ");
+        string destination = Console.ReadLine()?.Trim();
+
+        Console.Write("Enter Expected Departure/Arrival Time (hh:mm tt format): ");
+        string timeInput = Console.ReadLine()?.Trim();
+
+        if (!DateTime.TryParseExact(timeInput, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime expectedTime))
+        {
+            Console.WriteLine("Invalid time format. Please enter in hh:mm tt format (e.g., 10:30 AM).");
+            continue;
+        }
+
+        Console.Write("Would you like to enter a Special Request Code? (Y/N): ");
+        string specialRequestResponse = Console.ReadLine()?.Trim().ToUpper();
+        string specialRequest = "";
+
+        if (specialRequestResponse == "Y")
+        {
+            Console.Write("Enter Special Request Code: ");
+            specialRequest = Console.ReadLine()?.Trim();
+        }
+
+        // Create the Flight object
+        Flight newFlight = new Flight(flightNumber, origin, destination, expectedTime, "On Time");
+        flightlist.Add(newFlight);
+
+        // Append to flights.csv file using filePath
+        using (StreamWriter sw = new StreamWriter("flights.csv"))
+        {
+            sw.WriteLine($"{flightNumber},{origin},{destination},{expectedTime:hh:mm tt},{specialRequest}");
+        }
+
+        Console.Write("Would you like to add another flight? (Y/N): ");
+        string response = Console.ReadLine()?.Trim().ToUpper();
+        if (response != "Y")
+        {
+            Console.WriteLine("Flight(s) have been successfully added.");
+            break;
+        }
+    }
+}
 
 
 // Basic Features (7) (Wan Cheng)
