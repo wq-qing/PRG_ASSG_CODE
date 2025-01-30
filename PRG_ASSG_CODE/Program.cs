@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Design;
+﻿using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Globalization;
 using PRG_ASSG_CODE;
 //==========================================================
@@ -7,7 +8,11 @@ using PRG_ASSG_CODE;
 // Partner Name	: Tan Wan Cheng 
 //==========================================================
 
+
+
+
 List<Flight> flightlist = new List<Flight>();
+List<string[]> flightData = new List<string[]>();
 
 // Basic Features (1) (Wan Cheng)
 List<Airline> airlineList = new List<Airline>();
@@ -57,12 +62,17 @@ void LoadFlights()
 {
     using (StringReader sr = new StringReader("flights.csv"))
     {
-        string? flightscontent = sr.ReadLine();
+        string flightscontent = sr.ReadLine();
         if(( flightscontent= sr.ReadLine() )!= null)
         {
            string[] flight= flightscontent.Split(",");
+            flightData.Add(flight); //get raw flight data 
+            string flightNumber= flight[0];
+            string origin= flight[1];
+            string destination= flight[2];
+            DateTime expectedTime = Convert.ToDateTime(flight[3]);
             string specialRequest = flight[4];
-            flightlist.Add(new Flight(Convert.ToString(flightscontent[0]), Convert.ToString(flightscontent[1]), Convert.ToString(flightscontent[2]), Convert.ToDateTime(flightscontent[3]),"On Time"));
+            flightlist.Add(new Flight(flightNumber, origin,destination,expectedTime,"On Time"));
         }
         else
         {
@@ -102,23 +112,118 @@ void LoadFlights()
     Console.WriteLine(new string('=', header.Length));
     Console.WriteLine(header);
     Console.WriteLine(new string('=', header.Length));
-
+    foreach (var flight in flightlist)
+    {
+        string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
+        Console.WriteLine(string.Format(
+            "{0,-12} {1,-20} {2,-20} {3,-20} {dd/MM/yyyy hh:mm:ss tt}",
+            flight.FlightNumber, airlineName, flight.Origin, flight.Destination, flight.ExpectedTime
+        ));
     }
-foreach (var flight in flightlist)
-{
-    string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
-    Console.WriteLine(string.Format(
-        "{0,-12} {1,-20} {2,-20} {3,-20} {4:dd/MM/yyyy hh:mm:ss tt}",
-        flight.FlightNumber, airlineName, flight.Origin, flight.Destination, flight.ExpectedTime
-    ));
-}
 
+}
 
 // Basic Features (4) (Wan Cheng)
 // Basic Features (5) (Zoe)
+void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Flight> flightlist, List<Airline> airlineList)
+{ 
 
+    Console.WriteLine("Enter Flight Number: ");
+    string flightNumber = Console.ReadLine().Trim();
+    Flight flight = null;
+    string specialRequest = "None";
+    string AirlineName = GetAirlineName(flight.FlightNumber, airlineList);
+    if (flight == null)
+    {
+        Console.WriteLine("Flight not found.");
+        return;
+    }
+    else
+    {
+        foreach (var item in flightlist)
+        {
+            if (item.FlightNumber == flightNumber)
+            {
+                flight = item;
+          
+                foreach (var flightEntry in flightData)
+                {
+                    if (flightEntry[0] == flightNumber && flightEntry.Length >= 5)
+                    {
+                        specialRequest = string.IsNullOrEmpty(flightEntry[4]) ? "None" : flightEntry[4];
+                        Console.WriteLine("Flight Details:");
+                        Console.WriteLine($"Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}, Special Request: {specialRequest}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Flight Details:");
+                        Console.WriteLine($"Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}");
+                    }
+                }
+            }
+        }
+    }
+
+    while (true)
+    {
+        Console.WriteLine("Enter the Boarding Gate: ");
+        string boardingGate = Console.ReadLine()?.Trim();
+
+        if (string.IsNullOrEmpty(boardingGate))
+        {
+            Console.WriteLine("Invalid Boarding Gate. Please try again.");
+            continue;
+        }
+
+        if (BoardingGates.ContainsKey(boardingGate) && BoardingGates[boardingGate].Flight != null)
+        {
+            Console.WriteLine("The selected Boarding Gate is already assigned to another flight. Please choose a different gate.");
+            continue;
+        }
+
+        if (!BoardingGates.ContainsKey(boardingGate))
+        {
+            BoardingGates[boardingGate] = new BoardingGate(boardingGate, false, false, false, flight);
+        }
+        else
+        {
+            BoardingGates[boardingGate].Flight = flight;
+        }
+
+        Console.WriteLine("Would you like to update the flight status? (Y/N): ");
+        string response = Console.ReadLine()?.Trim().ToUpper();
+
+        if (response == "Y")
+        {
+            Console.WriteLine("Enter the new status (Delayed, Boarding, On Time): ");
+            string status = Console.ReadLine()?.Trim();
+
+            if (status == "Delayed" || status == "Boarding" || status == "On Time")
+            {
+                flight.Status = status;
+            }
+            else
+            {
+                Console.WriteLine("Invalid status entered. Setting the default status to 'On Time'.");
+                flight.Status = "On Time";
+            }
+        }
+        else
+        {
+            flight.Status = "On Time";
+        }
+
+        Console.WriteLine($"Successfully assigned Boarding Gate '{boardingGate}' to Flight '{flight.FlightNumber}'.");
+        Console.WriteLine($"Flight Details: Flight Number: {flight.FlightNumber}, Airline: {AirlineName}, Origin: {flight.Origin}, Destination: {flight.Destination}, Expected Time: {flight.ExpectedTime:dd/MM/yyyy hh:mm:ss tt}, Special Request: {specialRequest}, Boarding Gate: {boardingGate}, Status: {flight.Status}");
+        break;
+    }
+}
 // Basic Features (6) (Zoe)
+
+
 
 // Basic Features (7) (Wan Cheng)
 // Basic Features (8) (Wan Cheng)
 // Basic Features (9) (Zoe)
+
+
