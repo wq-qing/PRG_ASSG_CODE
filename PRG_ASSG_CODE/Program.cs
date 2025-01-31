@@ -269,27 +269,68 @@ void CreateNewFlight(List<Flight> flightlist)
 {
     while (true)
     {
-        Console.Write("Enter Flight Number: ");
-        string flightNumber = Console.ReadLine()?.Trim();
+        string flightNumber;
+        try
+        {
+            Console.Write("Enter Flight Number: ");
+            flightNumber = Console.ReadLine()?.Trim();
 
-        Console.Write("Enter Origin: ");
-        string origin = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(flightNumber) || flightNumber.Length < 6 || flightNumber[2] != ' ')
+                throw new Exception("Invalid Flight Number format.");
 
-        Console.Write("Enter Destination: ");
-        string destination = Console.ReadLine()?.Trim();
+            string airlineCode = flightNumber.Substring(0, 2).ToUpper(); 
+            string flightDigits = flightNumber.Substring(3);
+            bool airlineExists = airlineList.Any(a => a.Code.Equals(airlineCode, StringComparison.OrdinalIgnoreCase));
+            if (!airlineExists)
+                throw new Exception($"Invalid Airline Code '{airlineCode}'. Please enter a valid two-letter airline code.");
 
-        Console.Write("Enter Expected Departure/Arrival Time (hh:mm tt format): ");
-        string timeInput = Console.ReadLine()?.Trim();
+            if (!int.TryParse(flightDigits, out _))
+                throw new Exception("Invalid Flight Number. ");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            continue;
+        }
+        string origin;
+        try
+        {
+            Console.Write("Enter Origin: ");
+            origin = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(origin) || origin.Any(char.IsDigit))
+                throw new Exception("Invalid Origin.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            continue;
+        }
+
+        string destination;
+        try
+        {
+            Console.Write("Enter Destination: ");
+            destination = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(destination) || destination.Any(char.IsDigit))
+                throw new Exception("Invalid Destination. Please enter a valid location.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            continue;
+        }
 
         DateTime expectedTime;
         try
         {
+            Console.Write("Enter Expected Departure/Arrival Time (hh:mm tt format): ");
+            string timeInput = Console.ReadLine()?.Trim();
             expectedTime = DateTime.ParseExact(timeInput, "h:mm tt", CultureInfo.InvariantCulture);
         }
         catch (FormatException)
         {
-            Console.WriteLine("Invalid time format. Please enter in hh:mm tt format. Try again.");
-            break;
+            Console.WriteLine("Invalid time format. Please enter in hh:mm tt format.");
+            continue;
         }
 
         Console.WriteLine("Would you like to enter a Special Request Code? (Y/N): ");
@@ -307,7 +348,7 @@ void CreateNewFlight(List<Flight> flightlist)
         {
             sw.WriteLine($"{flightNumber},{origin},{destination},{expectedTime:hh:mm tt},{specialRequest}");
         }
-        Console.Write("Would you like to add another flight? (Y/N): ");
+        Console.WriteLine("Would you like to add another flight? (Y/N): ");
         string response = Console.ReadLine()?.Trim().ToUpper();
         if (response != "Y")
         {
@@ -320,6 +361,7 @@ void CreateNewFlight(List<Flight> flightlist)
         }
     }
 }
+
 // Basic Features (7) (Wan Cheng)
 
 void ListAirlines()
@@ -400,4 +442,3 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
     }
     Console.WriteLine(new string('=', header.Length));
 }
-
