@@ -29,7 +29,7 @@ void LoadAirlines()
             {
                 if ((flight.FlightNumber).Contains(airlineCode))
                 {
-                    airlineFlights[airlineCode] = flight;
+                    airlineFlights[flight.FlightNumber] = flight;
                 }
             }
             airlineList.Add(new Airline(airlineName, airlineCode, airlineFlights));
@@ -363,7 +363,7 @@ void CreateNewFlight(List<Flight> flightlist)
 }
 
 // Basic Features (7) (Wan Cheng)
-
+Dictionary<string, Flight> airlineFlights = new Dictionary<string, Flight>();
 void ListAirlines()
 {
     Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
@@ -374,24 +374,143 @@ void ListAirlines()
     {
         Console.WriteLine("{0, -16}{1, -19}", airline.Code, airline.Name);
     }
-    Console.Write("Enter Airline Code: ");
-    string airlineCodeEntered = Console.ReadLine().ToLower();
+    Console.Write("\nEnter Airline Code: ");
+    string airlineCodeEntered = Console.ReadLine().ToUpper();
     Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    bool header = false;
+    bool airlinePresent = false;
     foreach (Airline airline in airlineList)
     {
-        if (airline.Code.ToLower().Contains(airlineCodeEntered))
+        if (airline.Code.Contains(airlineCodeEntered) && header == false)
         {
+            header = true;
             Console.WriteLine($"List of flights for {airline.Name}");
             Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-            Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}{4, -31}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time");
-            Dictionary<string, Flight> flights = airline.Flights;
-            Console.WriteLine("{0, -16}{1, -23}{2, -23}{3, -23}{4, -31}", flights[airline.Code].FlightNumber, airline.Name, flights[airline.Code].Origin, flights[airline.Code].Destination, flights[airline.Code].ExpectedTime);
+            Console.WriteLine("{0, -16}{1, -23}{2, -23}", "Flight Number", "Origin", "Destination");
+        }
+        foreach (string flightNumber in airline.Flights.Keys)
+        {
+            if (flightNumber.Contains(airlineCodeEntered))
+            {
+                airlinePresent = true;
+                Dictionary<string, Flight> flights = airline.Flights;
+                airlineFlights[flightNumber] = flights[flightNumber];
+                Console.WriteLine("{0, -16}{1, -23}{2, -23}", flights[flightNumber].FlightNumber, flights[flightNumber].Origin, flights[flightNumber].Destination);
+            }
         }
     }
-
+    if (airlinePresent == false)
+    {
+        Console.WriteLine("Invalid Airline Code Entered.");
+    }
 }
+void ListFlightDetails()
+{ 
+    Console.Write("\nEnter the Flight Number: ");
+    string flightNumberEntered = Console.ReadLine().ToUpper();
+    string airlineName = "Not Available";
+    foreach (string flightNumber in airlineFlights.Keys)
+    {
+        if (flightNumberEntered == flightNumber)
+        {
+            foreach (Airline airline in airlineList)
+            {
+                if (flightNumber.Contains(airline.Code))
+                {
+                    airlineName = airline.Name;
+                    break;
+                }
+            }
+            Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+            Console.WriteLine($"Flight Deails for Flight Number {flightNumber}");
+            Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+            Console.WriteLine("{0, -32}: {1, -16}", "Flight Number", flightNumber);
+            Console.WriteLine("{0, -32}: {1, -16}", "Airline Name", airlineName);
+            Console.WriteLine("{0, -32}: {1, -16}", "Origin", airlineFlights[flightNumber].Origin);
+            Console.WriteLine("{0, -32}: {1, -16}", "Destination", airlineFlights[flightNumber].Destination);
+            Console.WriteLine("{0, -32}: {1, -16}", "Expected Departure/Arrival Time", airlineFlights[flightNumber].ExpectedTime);
+            break;
+        }
+    }
+    if (airlineName == "Not Available")
+    {
+        Console.WriteLine("Invalid Flight Number Entered.");
+    }
+}
+LoadFlights();
+LoadAirlines();
+ListAirlines();
+ListFlightDetails();
 
 // Basic Features (8) (Wan Cheng)
+
+void ModifyFlightDetails()
+{
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("What do you want to do with the Flight Details:");
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("[1] Modify an Existing Flight" +
+        "\n[2] Delete an Existing Flight");
+    string option = Console.ReadLine();
+    Console.Write("\nEnter the Flight Number: ");
+    string flightNumberEntered = Console.ReadLine().ToUpper();
+    string airlineName = "Not Available";
+    foreach (string flightNumber in airlineFlights.Keys)
+    {
+        if (flightNumberEntered == flightNumber)
+        {
+            foreach (Airline airline in airlineList)
+            {
+                if (flightNumber.Contains(airline.Code))
+                {
+                    airlineName = airline.Name;
+                    break;
+                }
+            }
+            using (StreamReader flight = new StreamReader("flights.csv"))
+            {
+                string flightLine;
+                string specialRequestCode = "None";
+                flight.ReadLine();
+                while ((flightLine = flight.ReadLine()) != null)
+                {
+                    string[] flightDetails = flightLine.Split(',');
+                    if (flightDetails[0] == flightNumber)
+                    {
+                        specialRequestCode = flightDetails[4];
+                    }
+                }
+
+
+                Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+                Console.WriteLine($"Flight Deails for Flight Number {flightNumber}");
+                Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+                Console.WriteLine("{0, -32}: {1, -16}", "Flight Number", flightNumber);
+                Console.WriteLine("{0, -32}: {1, -16}", "Airline Name", airlineName);
+                Console.WriteLine("{0, -32}: {1, -16}", "Origin", airlineFlights[flightNumber].Origin);
+                Console.WriteLine("{0, -32}: {1, -16}", "Destination", airlineFlights[flightNumber].Destination);
+                Console.WriteLine("{0, -32}: {1, -16}", "Expected Departure/Arrival Time", airlineFlights[flightNumber].ExpectedTime);
+                Console.WriteLine("{0, -32}: {1, -16}", "Status", airlineFlights[flightNumber].Status);
+                Console.WriteLine("{0, -32}: {1, -16}", "Special Request Code", specialRequestCode);
+                Console.WriteLine("{0, -32}: {1, -16}", "Boarding Gate", 
+                break;
+            }
+        }
+    }
+    if (airlineName == "Not Available")
+    {
+        Console.WriteLine("Invalid Flight Number Entered.");
+    }
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("Which information do you wish to update?");
+    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
+    Console.WriteLine("[1] Origin" +
+        "\n[2] Destination" +
+        "\n[3] Expected Departure/Arrival Time" +
+        "\n[4] Status" +
+        "\n[5] Special Request Code" +
+        "\n[6] Boarding Gate");
+}
 
 // Basic Features (9) (Zoe)
 
