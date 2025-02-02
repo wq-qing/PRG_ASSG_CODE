@@ -14,6 +14,7 @@ List<string[]> flightData = new List<string[]>();
 List<Airline> airlineList = new List<Airline>();
 void LoadAirlines()
 {
+    Console.WriteLine("Loading Airlines...");
     using (StreamReader airlinesFile = new StreamReader("airlines.csv"))
     {
         string? airline = airlinesFile.ReadLine();
@@ -33,10 +34,12 @@ void LoadAirlines()
             airlineList.Add(new Airline(airlineName, airlineCode, airlineFlights));
         }
     }
+    Console.WriteLine($"{airlineList.Count} Airlines Loaded!");
 }
 Dictionary<string, BoardingGate> boardingGateDictionary = new Dictionary<string, BoardingGate>();
 void LoadBoardingGates()
 {
+    Console.WriteLine("Loading Boarding Gates...");
     using (StreamReader boardingGatesFile = new StreamReader("boardinggates.csv"))
     {
         string? boardingGate = boardingGatesFile.ReadLine();
@@ -51,6 +54,7 @@ void LoadBoardingGates()
             boardingGateDictionary[gateName] = withoutFlight;
         }
     }
+    Console.WriteLine($"{boardingGateDictionary.Count} Boarding Gates Loaded!");
 }
 
 // Basic Features (2) (Zoe)
@@ -553,17 +557,24 @@ void ModifyFlightDetails()
                     if (airline.Flights.ContainsKey(flightNumberEntered))
                     {
                         flight = airline.Flights[flightNumberEntered];
+                        airline.Flights.Remove(flightNumberEntered);
+                        airlineFlights.Remove(flightNumberEntered);
+                        break;
                     }
                 }
                 flightlist.Remove(flight);
                 flightDictWithCode.Remove(flightNumberEntered);
                 boardingGateDictionary.Remove(flightNumberEntered);
+
                 Console.WriteLine("Flight deleted successfully.");
             }
             else
             {
                 Console.WriteLine("Deletion cancelled.");
             }
+            break;
+        default:
+            Console.WriteLine("Invalid Input.");
             break;
     }
 }
@@ -618,35 +629,111 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
     Console.WriteLine(new string('=', header.Length));
 }
 
-void DisplayMenu()
+Queue<Flight> unassignedFlights = new Queue<Flight>();
+List<BoardingGate> unassignedGates = new List<BoardingGate>();
+void ProcessAllUnassignedFlights()
 {
+    foreach (var flight in flightlist)
+    {
+        if (!boardingGateDictionary.Values.Select(gate => gate.Flight?.FlightNumber).Contains(flight.FlightNumber))
+        {
+            unassignedFlights.Enqueue(flight);
+        }
+    }
+
+    foreach (BoardingGate boardingGate in boardingGateDictionary.Values)
+    {
+        if (boardingGate.Flight == null)
+        {
+            unassignedGates.Add(boardingGate);
+        }
+    }
+    int unassignedflights = unassignedFlights.Count;
+    int unassignedgates = unassignedGates.Count;
+    Console.WriteLine($"\nTotal number of unassigned flights: {unassignedflights}");
+    Console.WriteLine($"Total number of unassigned boarding gates: {unassignedgates}");
+
+    int processedFlights = 0;
+    int processedGates = 0;
+
+    while (unassignedFlights.Count > 0 && unassignedGates.Count > 0)
+    {
+        Flight flight = unassignedFlights.Dequeue();
+        BoardingGate? gateChosen = null;
+
+        string specialRequestCode = flightDictWithCode[flight.FlightNumber][4];
+        if (specialRequestCode != "")
+        {
+            gateChosen = unassignedGates.FirstOrDefault(gate => specialRequestCode switch
+            {
+                "DDJB" => gate.SupportsDDJB,
+                "CFFT" => gate.SupportsCFFT,
+                "LWTT" => gate.SupportsLWTT,
+                _ => false
+            });
+        }
+
+        if (gateChosen == null)
+        {
+            gateChosen = unassignedGates.FirstOrDefault(gate => specialRequestCode switch
+            {
+                "DDJB" => !gate.SupportsDDJB,
+                "CFFT" => !gate.SupportsCFFT,
+                "LWTT" => !gate.SupportsLWTT,
+                _ => true
+            });
+        }
+
+        if (gateChosen != null)
+        {
+            gateChosen.Flight = flight;
+            unassignedGates.Remove(gateChosen);
+            processedFlights++;
+            processedGates++;
+        }
+    }
+
+    Console.WriteLine($"\nTotal flights processed and assigned: {processedFlights}");
+    Console.WriteLine($"Total gates processed and assigned: {processedGates}");
+    Console.WriteLine();
+    int totalFlights = flightlist.Count;
+    int totalGates = boardingGateDictionary.Count;
+    double processedFlightsOverUnassignedFlight = (processedFlights / unassignedflights) * 100;
+    double processedGatesOverUnassigneGates = (processedGates / unassignedgates) * 100;
+    Console.WriteLine($"Percentage of Flights processed automatically over those already assigned: {processedFlightsOverUnassignedFlight:0.00}%");
+    Console.WriteLine($"Percentage of Gates processed automatically over those already assigned: {processedGatesOverUnassigneGates:0.00}%");
+
+    void DisplayMenu()
+{
+    LoadFlights();
+    LoadAirlines();
+    LoadBoardingGates();
     while (true)
     {
         Console.WriteLine("\n=============================================");
         Console.WriteLine("   Welcome to Changi Airport Terminal 5");
         Console.WriteLine("=============================================");
-        Console.WriteLine("1. Load Flights");
-        Console.WriteLine("2. List All Flights");
-        Console.WriteLine("3. Assign Boarding Gate");
-        Console.WriteLine("4. Create New Flight");
-        Console.WriteLine("5. List Airlines");
-        Console.WriteLine("6. List Boarding Gates");
-        Console.WriteLine("7. Modify Flight Details");
-        Console.WriteLine("8. Display Scheduled Flights");
-        Console.WriteLine("9. Exit");
-        Console.Write("\nEnter your choice: ");
+        Console.WriteLine("1. List All Flights");
+        Console.WriteLine("2. List Boarding Gates");
+        Console.WriteLine("3. Assign a Boarding Gate to a Flight");
+        Console.WriteLine("4. Create Flight");
+        Console.WriteLine("5. Display Airline Flights");
+        Console.WriteLine("6. Modify Flight Details");
+        Console.WriteLine("7. Display Flight Schedule");
+        Console.WriteLine("8. Bulk Process Unassigned Flights");
+        Console.WriteLine("0. Exit");
+        Console.WriteLine("\nPlease enter your option: ");
 
         string choice = Console.ReadLine()?.Trim();
 
         switch (choice)
         {
             case "1":
-                LoadFlights();
-                LoadAirlines();
+                ListAllFlights(flightlist, airlineList);
                 break;
 
             case "2":
-                ListAllFlights(flightlist, airlineList);
+                ListBoardingGates();
                 break;
 
             case "3":
@@ -663,21 +750,20 @@ void DisplayMenu()
                 break;
 
             case "6":
-                ListBoardingGates();
+                ListAirlines();
+                ModifyFlightDetails();
                 break;
 
             case "7":
-                ListAirlines();
-                ModifyFlightDetails();
-                
-                break;
-
-            case "8":
                 DisplayScheduledFlights(flightlist, airlineList, boardingGateDictionary);
                 break;
 
-            case "9":
-                Console.WriteLine("Exiting Flight Management System. Goodbye!");
+            case "8":
+                ProcessAllUnassignedFlights();
+                break;
+
+            case "0":
+                Console.WriteLine("Goodbye!");
                 return;
 
             default:
@@ -689,5 +775,3 @@ void DisplayMenu()
 
 
 DisplayMenu();
-
-//hello
