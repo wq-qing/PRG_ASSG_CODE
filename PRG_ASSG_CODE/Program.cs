@@ -7,9 +7,6 @@ using System.Globalization;
 // Partner Name	: Tan Wan Cheng 
 //==========================================================
 
-
-
-
 List<Flight> flightlist = new List<Flight>();
 List<string[]> flightData = new List<string[]>();
 
@@ -621,5 +618,73 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
     Console.WriteLine(new string('=', header.Length));
 }
 
+void DisplayMenu()
+{
+    while (true)
+    {
+        Console.WriteLine("\n=============================================");
+        Console.WriteLine("   Welcome to Changi Airport Terminal 5");
+        Console.WriteLine("=============================================");
+        Console.WriteLine("1. Load Flights");
+        Console.WriteLine("2. List All Flights");
+        Console.WriteLine("3. Assign Boarding Gate");
+        Console.WriteLine("4. Create New Flight");
+        Console.WriteLine("5. List Airlines");
+        Console.WriteLine("6. List Boarding Gates");
+        Console.WriteLine("7. Modify Flight Details");
+        Console.WriteLine("8. Display Scheduled Flights");
+        Console.WriteLine("9. Exit");
+        Console.Write("\nEnter your choice: ");
+
+        string choice = Console.ReadLine()?.Trim();
+
+        switch (choice)
+        {
+            case "1":
+                LoadFlights();
+                break;
+
+            case "2":
+                ListAllFlights(flightlist, airlineList);
+                break;
+
+            case "3":
+                AssignBoardingGate(boardingGateDictionary, flightlist, airlineList);
+                break;
+
+            case "4":
+                CreateNewFlight(flightlist);
+                break;
+
+            case "5":
+                ListAirlines();
+                ListFlightDetails();
+                break;
+
+            case "6":
+                ListBoardingGates();
+                break;
+
+            case "7":
+                ListAirlines();
+                ModifyFlightDetails();
+                
+                break;
+
+            case "8":
+                DisplayScheduledFlights(flightlist, airlineList, boardingGateDictionary);
+                break;
+
+            case "9":
+                Console.WriteLine("Exiting Flight Management System. Goodbye!");
+                return;
+
+            default:
+                Console.WriteLine("Invalid choice. Please enter a valid option.");
+                break;
+        }
+    }
+}
 
 
+DisplayMenu();
