@@ -26,15 +26,13 @@ namespace PRG_ASSG_CODE
 
         public bool AddFlight(Flight flight)
         {
-            if (!Flights.ContainsKey(flight.FlightNumber))
+            if (Flights.ContainsKey(flight.FlightNumber))
             {
                 Flights[flight.FlightNumber] = flight;
                 return true;
             }
             return false;
         }
-
-
         public double CalculateFees()
         {
             double numOfFlights = Flights.Count;
