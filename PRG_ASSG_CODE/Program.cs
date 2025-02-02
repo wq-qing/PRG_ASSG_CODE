@@ -604,7 +604,6 @@ void ModifyFlightDetails()
     }
 }
 
-// Basic Features (9) (Zoe)
 
 // Basic Features (9) (Zoe)
 void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList, Dictionary<string, BoardingGate> BoardingGates)
@@ -875,7 +874,7 @@ void DisplayMenu()
         Console.WriteLine("6. Modify Flight Details");
         Console.WriteLine("7. Display Flight Schedule");
         Console.WriteLine("8. Bulk Process Unassigned Flights");
-        Console.WriteLine("Display the total fee per airline for the day");
+        Console.WriteLine("9. Display the total fee per airline for the day");
         Console.WriteLine("0. Exit");
         Console.WriteLine("\nPlease enter your option: ");
 
