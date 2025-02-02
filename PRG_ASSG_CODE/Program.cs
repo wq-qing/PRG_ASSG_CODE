@@ -1,4 +1,5 @@
 ﻿using PRG_ASSG_CODE;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 //==========================================================
 // Student Number	: S10267952A S10266775
@@ -437,79 +438,137 @@ void ListFlightDetails()
         Console.WriteLine("Invalid Flight Number Entered.");
     }
 }
-LoadFlights();
-LoadAirlines();
-ListAirlines();
-ListFlightDetails();
 
 // Basic Features (8) (Wan Cheng)
-
+Dictionary<string, List<string>> flightDictWithCode = new Dictionary<string, List<string>>();
 void ModifyFlightDetails()
 {
-    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-    Console.WriteLine("What do you want to do with the Flight Details:");
-    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-    Console.WriteLine("[1] Modify an Existing Flight" +
-        "\n[2] Delete an Existing Flight");
-    string option = Console.ReadLine();
-    Console.Write("\nEnter the Flight Number: ");
+    Console.WriteLine("Choose an existing Flight to modify or delete:");
     string flightNumberEntered = Console.ReadLine().ToUpper();
-    string airlineName = "Not Available";
     foreach (string flightNumber in airlineFlights.Keys)
     {
         if (flightNumberEntered == flightNumber)
         {
-            foreach (Airline airline in airlineList)
-            {
-                if (flightNumber.Contains(airline.Code))
-                {
-                    airlineName = airline.Name;
-                    break;
-                }
-            }
             using (StreamReader flight = new StreamReader("flights.csv"))
             {
                 string flightLine;
-                string specialRequestCode = "None";
                 flight.ReadLine();
                 while ((flightLine = flight.ReadLine()) != null)
                 {
+                    List<string> flightItems = new List<string>();
                     string[] flightDetails = flightLine.Split(',');
-                    if (flightDetails[0] == flightNumber)
-                    {
-                        specialRequestCode = flightDetails[4];
-                    }
+                    flightItems.Add(flightDetails[0]);
+                    flightItems.Add(flightDetails[1]);
+                    flightItems.Add(flightDetails[2]);
+                    flightItems.Add(flightDetails[3]);
+                    flightItems.Add(flightDetails[4]);
+                    flightDictWithCode[flightDetails[0]] = flightItems;
                 }
-
-
-                Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-                Console.WriteLine($"Flight Deails for Flight Number {flightNumber}");
-                Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-                Console.WriteLine("{0, -32}: {1, -16}", "Flight Number", flightNumber);
-                Console.WriteLine("{0, -32}: {1, -16}", "Airline Name", airlineName);
-                Console.WriteLine("{0, -32}: {1, -16}", "Origin", airlineFlights[flightNumber].Origin);
-                Console.WriteLine("{0, -32}: {1, -16}", "Destination", airlineFlights[flightNumber].Destination);
-                Console.WriteLine("{0, -32}: {1, -16}", "Expected Departure/Arrival Time", airlineFlights[flightNumber].ExpectedTime);
-                Console.WriteLine("{0, -32}: {1, -16}", "Status", airlineFlights[flightNumber].Status);
-                Console.WriteLine("{0, -32}: {1, -16}", "Special Request Code", specialRequestCode);
-                Console.WriteLine("{0, -32}: {1, -16}", "Boarding Gate", 
                 break;
             }
         }
     }
-    if (airlineName == "Not Available")
-    {
-        Console.WriteLine("Invalid Flight Number Entered.");
+    Console.WriteLine("1. Modify Flight" +
+        "\n2. Delete Flight");
+    Console.WriteLine("Choose an option:");
+    string option = Console.ReadLine();
+    switch (option)
+    {    
+        case "1":
+            Console.WriteLine("1. Modify Basic Information"+
+            "\n2. Modify Status" +
+            "\n3. Modify Special Request Code" +
+            "\n4. Modify Boarding Gate");
+            Console.WriteLine("Choose an option:");
+            string furtherOption = Console.ReadLine();
+            switch (furtherOption)
+            {
+                case "1":
+                    foreach (string flightNumber in flightDictWithCode.Keys)
+                    {
+                        if (flightNumberEntered == flightNumber)
+                        {
+                            Console.Write("Enter new Origin: ");
+                            string origin = Console.ReadLine();
+                            airlineFlights[flightNumberEntered].Origin = origin;
+                            flightDictWithCode[flightNumber][1] = origin;
+                            Console.Write("Enter new Destination: ");
+                            string destination = Console.ReadLine();
+                            airlineFlights[flightNumberEntered].Destination = destination;
+                            flightDictWithCode[flightNumber][2] = destination;
+                            Console.Write("Enter new Expected Departure/ Arrival Time(dd / mm / yyyy hh: mm): ");
+                            string expectedTime = Console.ReadLine();
+                            airlineFlights[flightNumberEntered].ExpectedTime = Convert.ToDateTime(expectedTime);
+                            flightDictWithCode[flightNumber][3] = expectedTime;
+                            Console.WriteLine("Flight Updated!");
+                            break;
+                        }
+                    }
+                    break;
+                case "2":
+                    Console.Write("Enter new Status: ");
+                    airlineFlights[flightNumberEntered].Status = Console.ReadLine();
+                    Console.WriteLine("Flight Updated!");
+                    break;
+                case "3":
+                    foreach (string flightNumber in flightDictWithCode.Keys)
+                    {
+                        if (flightNumberEntered == flightNumber)
+                        {
+                            Console.Write("Enter new Special Request Code: ");
+                            string specialRequestCode = Console.ReadLine().ToUpper();
+                            flightDictWithCode[flightNumber][4] = specialRequestCode;
+                            break;
+                        }
+                    }
+                    Console.WriteLine("Flight Updated!");
+                    break;
+                case "4":
+                    Console.Write("Enter new Boarding Gate: ");
+                    string boardingGateEntered = Console.ReadLine().ToUpper();
+                    foreach (string gateName in boardingGateDictionary.Keys)
+                    {
+                        if (boardingGateEntered == gateName)
+                        {
+                            foreach (Airline airline in airlineList)
+                            {
+                                if (airline.Flights.ContainsKey(flightNumberEntered))
+                                {
+                                    boardingGateDictionary[gateName].Flight = airlineFlights[flightNumberEntered];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    Console.WriteLine("Flight Updated!");
+                    break;
+            }
+            break;
+        case "2":
+            Console.WriteLine("Are you sure you want to delete this flight? (Y/N)");
+            string confirm = Console.ReadLine().ToUpper();
+
+            if (confirm == "Y")
+            {
+                Flight flight = null;
+                foreach (Airline airline in airlineList)
+                {
+                    if (airline.Flights.ContainsKey(flightNumberEntered))
+                    {
+                        flight = airline.Flights[flightNumberEntered];
+                    }
+                }
+                flightlist.Remove(flight);
+                flightDictWithCode.Remove(flightNumberEntered);
+                boardingGateDictionary.Remove(flightNumberEntered);
+                Console.WriteLine("Flight deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Deletion cancelled.");
+            }
+            break;
     }
-    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-    Console.WriteLine("Which information do you wish to update?");
-    Console.WriteLine(string.Concat(Enumerable.Repeat("=", 45)));
-    Console.WriteLine("[1] Origin" +
-        "\n[2] Destination" +
-        "\n[3] Expected Departure/Arrival Time" +
-        "\n[4] Status" +
-        "\n[5] Special Request Code" +
-        "\n[6] Boarding Gate");
 }
 
 // Basic Features (9) (Zoe)
