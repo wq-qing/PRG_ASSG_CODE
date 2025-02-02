@@ -95,12 +95,12 @@ string GetAirlineName(string flightNumber, List<Airline> airlineList)
     {
         if (airline.Code == airlineCode)
         {
-            return airline.Name; 
+            return airline.Name;
         }
     }
-
-    return "Unknown Airline";
+    return "";
 }
+
 
 void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
 {
@@ -110,7 +110,7 @@ void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
         return;
     }
     string header = string.Format(
-        "{0,-12} {1,-20} {2,-20} {3,-20} {4}",
+        "{0,-12} {1,-19} {2,-19} {3,-19} {4,23}",
         "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time"
     );
     Console.WriteLine(new string('=', header.Length));
@@ -120,7 +120,7 @@ void ListAllFlights(List<Flight> flightlist, List<Airline> airlineList)
     {
         string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
         Console.WriteLine(string.Format(
-     "{0,-12} {1,-20} {2,-20} {3,-20} {4}",
+     "{0,-12} {1,-19} {2,-19} {3,-19} {4,23}",
      flight.FlightNumber, airlineName, flight.Origin, flight.Destination, flight.ExpectedTime.ToString("dd/MM/yyyy hh:mm:ss tt")
  ));
 
@@ -265,101 +265,126 @@ void AssignBoardingGate(Dictionary<string, BoardingGate> BoardingGates, List<Fli
         Console.WriteLine($"Flight {flight.FlightNumber} has been assigned to Boarding Gate {boardingGate}!");
         break;
     }
-}                                                                                    
+}
 // Basic Features (6) (Zoe)
 void CreateNewFlight(List<Flight> flightlist)
 {
     while (true)
     {
         string flightNumber;
-        try
+        while (true)
         {
-            Console.Write("Enter Flight Number: ");
-            flightNumber = Console.ReadLine()?.Trim();
+            try
+            {
+                Console.Write("Enter Flight Number (e.g., SQ 123): ");
+                flightNumber = Console.ReadLine()?.Trim();
 
-            if (string.IsNullOrEmpty(flightNumber) || flightNumber.Length < 6 || flightNumber[2] != ' ')
-                throw new Exception("Invalid Flight Number format.");
+                if (string.IsNullOrEmpty(flightNumber) || flightNumber.Length < 6 || flightNumber[2] != ' ')
+                    throw new Exception("Invalid Flight Number format.Please try again.");
 
-            string airlineCode = flightNumber.Substring(0, 2).ToUpper(); 
-            string flightDigits = flightNumber.Substring(3);
-            bool airlineExists = airlineList.Any(a => a.Code.Equals(airlineCode, StringComparison.OrdinalIgnoreCase));
-            if (!airlineExists)
-                throw new Exception($"Invalid Airline Code '{airlineCode}'. Please enter a valid two-letter airline code.");
+                string airlineCode = flightNumber.Substring(0, 2).ToUpper();
+                string flightDigits = flightNumber.Substring(3).Trim();
 
-            if (!int.TryParse(flightDigits, out _))
-                throw new Exception("Invalid Flight Number. ");
+                if (airlineList == null || airlineList.Count == 0)
+                    throw new Exception("Airline list is empty.");
+
+
+                bool airlineExists = airlineList.Any(a => a.Code.Trim().Equals(airlineCode, StringComparison.OrdinalIgnoreCase));
+
+                if (!airlineExists)
+                    throw new Exception($"Invalid Airline Code '{airlineCode}'. Please enter a valid two-letter airline code.");
+
+                if (!int.TryParse(flightDigits, out _))
+                    throw new Exception("Invalid Flight Number.Please try again.");
+
+                break;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                continue;
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            continue;
-        }
+
         string origin;
-        try
+        while (true)
         {
-            Console.Write("Enter Origin: ");
-            origin = Console.ReadLine()?.Trim();
-            if (string.IsNullOrEmpty(origin) || origin.Any(char.IsDigit))
-                throw new Exception("Invalid Origin.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            continue;
+            try
+            {
+                Console.Write("Enter Origin: ");
+                origin = Console.ReadLine()?.Trim();
+                if (string.IsNullOrEmpty(origin) || origin.Any(char.IsDigit))
+                    throw new Exception("Invalid Origin. Please enter a valid location.");
+                break; // Valid input, exit loop
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         string destination;
-        try
+        while (true)
         {
-            Console.Write("Enter Destination: ");
-            destination = Console.ReadLine()?.Trim();
-            if (string.IsNullOrEmpty(destination) || destination.Any(char.IsDigit))
-                throw new Exception("Invalid Destination. Please enter a valid location.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            continue;
+            try
+            {
+                Console.Write("Enter Destination: ");
+                destination = Console.ReadLine()?.Trim();
+                if (string.IsNullOrEmpty(destination) || destination.Any(char.IsDigit))
+                    throw new Exception("Invalid Destination. Please enter a valid location.");
+                break; // Valid input, exit loop
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         DateTime expectedTime;
-        try
+        while (true)
         {
-            Console.Write("Enter Expected Departure/Arrival Time (hh:mm tt format): ");
-            string timeInput = Console.ReadLine()?.Trim();
-            expectedTime = DateTime.ParseExact(timeInput, "h:mm tt", CultureInfo.InvariantCulture);
-        }
-        catch (FormatException)
-        {
-            Console.WriteLine("Invalid time format. Please enter in hh:mm tt format.");
-            continue;
+            try
+            {
+                Console.WriteLine("Enter Expected Departure/Arrival Time (dd/MM/yyyy HH:mm): ");
+                string timeInput = Console.ReadLine()?.Trim();
+                expectedTime = DateTime.ParseExact(timeInput, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+
+                break;
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Invalid time format. Please enter in 'dd/MM/yyyy HH:mm.");
+            }
+
         }
 
         Console.WriteLine("Would you like to enter a Special Request Code? (Y/N): ");
-        string specialRequestResponse = Console.ReadLine()?.Trim().ToUpper();
+        string specialRequestResponse = Console.ReadLine().Trim().ToUpper();
         string specialRequest = "";
 
         if (specialRequestResponse == "Y")
         {
-            Console.WriteLine("Enter Special Request Code: ");
+            Console.Write("Enter Special Request Code: ");
             specialRequest = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(specialRequest))
+            {
+                Console.WriteLine("No special request entered.");
+                specialRequest = "None";
+            }
         }
         Flight newFlight = new Flight(flightNumber, origin, destination, expectedTime, "On Time");
         flightlist.Add(newFlight);
-        using (StreamWriter sw = new StreamWriter("flights.csv" ,true))
+        using (StreamWriter sw = new StreamWriter("flights.csv", true))
         {
-            sw.WriteLine($"{flightNumber},{origin},{destination},{expectedTime:hh:mm tt},{specialRequest}");
+            sw.WriteLine($"{flightNumber},{origin},{destination},{expectedTime:dd/MM/yyyy hh:mm tt},{specialRequest}");
         }
+
         Console.WriteLine("Would you like to add another flight? (Y/N): ");
         string response = Console.ReadLine()?.Trim().ToUpper();
         if (response != "Y")
         {
             Console.WriteLine("Flight(s) have been successfully added.");
             break;
-        }
-        else
-        {
-            CreateNewFlight(flightlist);
         }
     }
 }
@@ -581,6 +606,7 @@ void ModifyFlightDetails()
 
 // Basic Features (9) (Zoe)
 
+// Basic Features (9) (Zoe)
 void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList, Dictionary<string, BoardingGate> BoardingGates)
 {
     if (flightlist.Count == 0)
@@ -588,29 +614,33 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
         Console.WriteLine("No flights scheduled for today.");
         return;
     }
-    flightlist = flightlist.OrderBy(f => f.ExpectedTime).ToList();
+
+    flightlist.Sort((f1, f2) => f1.ExpectedTime.CompareTo(f2.ExpectedTime));
 
     string header = string.Format(
-        "{0,-12} {1,-20} {2,-20} {3,-20} {4,-20} {5,-12} {6,-20} {7,-10}",
-        "Flight Number", "Airline Name", "Origin", "Destination", "Expected Time", "Status", "Special Request", "Boarding Gate"
+        "{0,-12} {1,-20} {2,-20} {3,-20} {4,-22} {5,-12} {6,-20} {7,-15}",
+        "Flight No", "Airline Name", "Origin", "Destination", "Expected Time", "Status", "Special Request", "Boarding Gate"
     );
+
     Console.WriteLine(new string('=', header.Length));
     Console.WriteLine(header);
     Console.WriteLine(new string('=', header.Length));
 
+
     foreach (var flight in flightlist)
     {
         string airlineName = GetAirlineName(flight.FlightNumber, airlineList);
-        string specialRequest = "None";
-        string boardingGate = "None";
+        string specialRequest = "";
+        string boardingGate = "Not Assigned";
         foreach (var flightEntry in flightData)
         {
             if (flightEntry[0] == flight.FlightNumber && flightEntry.Length >= 5)
             {
-                specialRequest = string.IsNullOrEmpty(flightEntry[4]) ? "None" : flightEntry[4];
+                specialRequest = string.IsNullOrWhiteSpace(flightEntry[4]) ? "" : flightEntry[4];
                 break;
             }
         }
+
         foreach (var gate in BoardingGates)
         {
             if (gate.Value.Flight != null && gate.Value.Flight.FlightNumber == flight.FlightNumber)
@@ -621,15 +651,30 @@ void DisplayScheduledFlights(List<Flight> flightlist, List<Airline> airlineList,
         }
 
         Console.WriteLine(string.Format(
-            "{0,-12} {1,-20} {2,-20} {3,-20} {4,-20} {5,-12} {6,-20} {7,-10}",
-            flight.FlightNumber, airlineName, flight.Origin, flight.Destination,
-            flight.ExpectedTime.ToString("dd/MM/yyyy hh:mm tt"), flight.Status, specialRequest, boardingGate
+            "{0,-12} {1,-20} {2,-20} {3,-20} {4,-22} {5,-12} {6,-20} {7,-15}",
+            flight.FlightNumber,
+            string.IsNullOrWhiteSpace(airlineName) ? "Unknown Airline" : airlineName,
+            flight.Origin,
+            flight.Destination,
+            flight.ExpectedTime.ToString("dd/MM/yyyy hh:mm tt"),
+            flight.Status,
+            string.IsNullOrWhiteSpace(specialRequest) ? "" : specialRequest,
+            boardingGate
         ));
     }
+
     Console.WriteLine(new string('=', header.Length));
 }
 
-Queue<Flight> unassignedFlights = new Queue<Flight>();
+
+int CompareFlightsByExpectedTime(Flight f1, Flight f2)
+{
+    return f1.ExpectedTime.CompareTo(f2.ExpectedTime);
+}
+
+
+//Additional Feature A (Wan Cheng)
+Queue <Flight> unassignedFlights = new Queue<Flight>();
 List<BoardingGate> unassignedGates = new List<BoardingGate>();
 void ProcessAllUnassignedFlights()
 {
@@ -702,8 +747,117 @@ void ProcessAllUnassignedFlights()
     double processedGatesOverUnassigneGates = (processedGates / unassignedgates) * 100;
     Console.WriteLine($"Percentage of Flights processed automatically over those already assigned: {processedFlightsOverUnassignedFlight:0.00}%");
     Console.WriteLine($"Percentage of Gates processed automatically over those already assigned: {processedGatesOverUnassigneGates:0.00}%");
+}
 
-    void DisplayMenu()
+//Additional Feature B  (Zoe)
+
+void DisplayTotalFeesPerAirline(List<Flight> flightlist, List<Airline> airlineList, Dictionary<string, BoardingGate> boardingGates)
+{
+
+    var unassignedFlights = flightlist.Where(f => !boardingGates.Values.Any(bg => bg.Flight != null && bg.Flight.FlightNumber == f.FlightNumber)).ToList();
+
+    if (unassignedFlights.Count > 0)
+    {
+        Console.WriteLine("\nThe following flights have not been assigned a boarding gate:");
+        foreach (var flight in unassignedFlights)
+        {
+            Console.WriteLine($"- {flight.FlightNumber} ({GetAirlineName(flight.FlightNumber, airlineList)})");
+        }
+        Console.WriteLine("\nPlease assign boarding gates to all flights.\n");
+        return;
+    }
+
+    Console.WriteLine("\n===============================");
+    Console.WriteLine("  Total Fees per Airline for Today");
+    Console.WriteLine("===============================");
+
+    double totalAirlineFees = 0;
+    double totalDiscounts = 0;
+
+    foreach (var airline in airlineList)
+    {
+        double airlineSubtotal = 0;
+        double airlineDiscounts = 0;
+
+        var airlineFlights = flightlist.Where(f => f.FlightNumber.StartsWith(airline.Code)).ToList();
+
+        if (airlineFlights.Count == 0) continue;
+
+        Console.WriteLine($"\nAirline: {airline.Name} ({airline.Code})");
+        Console.WriteLine("---------------------------------------");
+
+        foreach (var flight in airlineFlights)
+        {
+            double flightFee = 300;
+
+            if (flight.Origin == "Singapore (SIN)")
+            {
+                flightFee += 800;
+            }
+            else if (flight.Destination == "Singapore (SIN)")
+            {
+                flightFee += 500;
+            }
+
+            string specialRequest = "None";
+            foreach (var flightEntry in flightData)
+            {
+                if (flightEntry[0] == flight.FlightNumber && flightEntry.Length >= 5)
+                {
+                    specialRequest = flightEntry[4].Trim();
+                    break;
+                }
+            }
+
+            if (specialRequest == "CFFT")
+            {
+                flightFee += 150;
+            }
+            else if (specialRequest == "DDJB")
+            {
+                flightFee += 300;
+            }
+            else if (specialRequest == "LWTT")
+            {
+                flightFee += 500;
+            }
+
+            Console.WriteLine($"Flight {flight.FlightNumber} - Fee: ${flightFee}");
+
+            airlineSubtotal += flightFee;
+        }
+
+
+        if (airlineFlights.Count >= 5)
+        {
+            airlineDiscounts = airlineSubtotal * 0.10;
+        }
+
+        double finalFee = airlineSubtotal - airlineDiscounts;
+
+        Console.WriteLine($"\nSubtotal: ${airlineSubtotal}");
+        Console.WriteLine($"Discounts: -${airlineDiscounts}");
+        Console.WriteLine($"Final Fee to be Collected: ${finalFee}");
+        Console.WriteLine("---------------------------------------");
+
+        totalAirlineFees += airlineSubtotal;
+        totalDiscounts += airlineDiscounts;
+    }
+
+    double totalFinalFees = totalAirlineFees - totalDiscounts;
+    double discountPercentage = (totalDiscounts / totalAirlineFees) * 100;
+
+    Console.WriteLine("\n===============================");
+    Console.WriteLine(" Total Sum");
+    Console.WriteLine("===============================");
+    Console.WriteLine($"Total Airline Fees (Before Discounts): ${totalAirlineFees}");
+    Console.WriteLine($"Total Discounts Applied: -${totalDiscounts}");
+    Console.WriteLine($"Total Fees Collected: ${totalFinalFees}");
+    Console.WriteLine($"Discount Percentage: {discountPercentage:F2}%");
+    Console.WriteLine("===============================");
+}
+
+void DisplayMenu()
 {
     LoadFlights();
     LoadAirlines();
@@ -721,6 +875,7 @@ void ProcessAllUnassignedFlights()
         Console.WriteLine("6. Modify Flight Details");
         Console.WriteLine("7. Display Flight Schedule");
         Console.WriteLine("8. Bulk Process Unassigned Flights");
+        Console.WriteLine("Display the total fee per airline for the day");
         Console.WriteLine("0. Exit");
         Console.WriteLine("\nPlease enter your option: ");
 
@@ -760,6 +915,10 @@ void ProcessAllUnassignedFlights()
 
             case "8":
                 ProcessAllUnassignedFlights();
+                break;
+
+            case "9":
+                DisplayTotalFeesPerAirline(flightlist, airlineList, boardingGateDictionary);
                 break;
 
             case "0":
