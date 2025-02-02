@@ -642,6 +642,7 @@ void DisplayMenu()
         {
             case "1":
                 LoadFlights();
+                LoadAirlines();
                 break;
 
             case "2":
